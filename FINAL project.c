@@ -27,6 +27,7 @@ void showSCR( );
 /* Game ralating*/
 void Movepos( int D);
 void Gameover();
+void flash( int flag);
 
 /* 4*7 segenment LED*/
 void pinsfor7x4();
@@ -58,9 +59,10 @@ void setup() {
   /*set up the pins*/
   SetLED();
   /*set up the 8*8 led */
-  pinsforSCR();
-  testled();
+  
+//  testled();
  /*code below is to control*/
+ Gameover();
 
 }
 
@@ -73,14 +75,14 @@ void loop() {
    ppos = npos;
    if( turns % 8 == 0) {
      
-     
+     rollingdown(); 
      int nextled = Getdata();
      if( nextled != 0)  SCR[nextled - 1].stat = 1;
      else Serial.print("it's zero!");
-     rollingdown(); 
+     
    }
    
-
+   if( life == 0) Gameover();
    //display
 /*   for( int j = 0; j < 5; j++) {
     pinsforSCR();
@@ -136,13 +138,15 @@ void SetLED(){
         cnt++;
       }
   }
+
+  /* code below is to test if led is broken*/
   
-  for( int i = 0; i < 32; i++){
+ /* for( int i = 0; i < 32; i++){
      SCR[i].stat = 1;
      for( int j = 0; j < 10; j++) showSCR();
      SCR[i].stat = 0;
   }
-  checkroll();
+  checkroll();*/
 }
 
 
@@ -233,8 +237,8 @@ void testled(){
   
   for( int i = 0; i < 20; i++){
     clearnum();
-    digitalWrite( 0, LOW);
-    digitalWrite( 1, LOW);
+    digitalWrite( A4, LOW);
+    digitalWrite( A5, LOW);
     digitalWrite( A1, LOW);
     delay(50);
   }
@@ -323,5 +327,30 @@ int Getdata(){
   else if( rate > 0.05) return 1;
   else return 0;
   
+}
+
+void Gameover(){
+  flash( 1);
+  while(1){
+    showSCR();
+    if( abs (analogRead( A0) - analogRead( A0)) > 0) break;
+  }
+  flash( 2);
+  life = 9;
+  maxfreq = 0;
+  score = 0;
+}
+
+void flash( int flag){
+  SCR[5].stat  = flag;
+  SCR[6].stat  = flag;
+  SCR[8].stat  = flag;
+  SCR[12].stat = flag;
+  SCR[16].stat = flag;
+  SCR[11].stat = flag;
+  SCR[15].stat = flag;
+  SCR[19].stat = flag;
+  SCR[21].stat = flag;
+  SCR[22].stat = flag;
 }
 
